@@ -1,9 +1,10 @@
 """The Game of Hog."""
 
 from dice import six_sided, make_test_dice
-from ucb import main, trace, interact
+from ucb import main
 
 GOAL = 100  # The goal of Hog is to score 100 points.
+
 
 ######################
 # Phase 1: Simulator #
@@ -21,7 +22,20 @@ def roll_dice(num_rolls, dice=six_sided):
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
-    "*** YOUR CODE HERE ***"
+    total = 0
+
+    i = 0
+    while i < num_rolls:
+        roll = dice()
+
+        if roll == 1 or total == 1:
+            total = 1
+        else:
+            total += roll
+
+        i += 1
+
+    return total
     # END PROBLEM 1
 
 
@@ -33,7 +47,10 @@ def boar_brawl(player_score, opponent_score):
 
     """
     # BEGIN PROBLEM 2
-    "*** YOUR CODE HERE ***"
+    player_score_ones_digit = player_score % 10
+    opponent_score_tens_digit = opponent_score // 10 % 10
+
+    return max(1, 3 * abs(player_score_ones_digit - opponent_score_tens_digit))
     # END PROBLEM 2
 
 
@@ -51,7 +68,10 @@ def take_turn(num_rolls, player_score, opponent_score, dice=six_sided):
     assert num_rolls >= 0, 'Cannot roll a negative number of dice in take_turn.'
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
     # BEGIN PROBLEM 3
-    "*** YOUR CODE HERE ***"
+    if not num_rolls:
+        return boar_brawl(player_score, opponent_score)
+
+    return roll_dice(num_rolls, dice)
     # END PROBLEM 3
 
 
@@ -61,6 +81,7 @@ def simple_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """
     score = player_score + take_turn(num_rolls, player_score, opponent_score, dice)
     return score
+
 
 def is_prime(n):
     """Return whether N is prime."""
@@ -73,17 +94,32 @@ def is_prime(n):
         k += 1
     return True
 
+
 def num_factors(n):
     """Return the number of factors of N, including 1 and N itself."""
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    total_factors = 2
+
+    i = 2
+    while i * i < n:
+        if not n % i:
+            total_factors += 2
+
+        i += 1
+
+    if i * i == n:
+        total_factors += 1
+
+    return total_factors
     # END PROBLEM 4
+
 
 def sus_points(score):
     """Return the new score of a player taking into account the Sus Fuss rule."""
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
     # END PROBLEM 4
+
 
 def sus_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the total score of a player who starts their turn with
@@ -242,7 +278,7 @@ def run_experiments():
     six_sided_max = max_scoring_num_rolls(six_sided)
     print('Max scoring num rolls for six-sided dice:', six_sided_max)
 
-    print('always_roll(6) win rate:', average_win_rate(always_roll(6))) # near 0.5
+    print('always_roll(6) win rate:', average_win_rate(always_roll(6)))  # near 0.5
     print('catch_up win rate:', average_win_rate(catch_up))
     print('always_roll(3) win rate:', average_win_rate(always_roll(3)))
     print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
@@ -251,7 +287,6 @@ def run_experiments():
     print('sus_strategy win rate:', average_win_rate(sus_strategy))
     print('final_strategy win rate:', average_win_rate(final_strategy))
     "*** You may add additional experiments as you wish ***"
-
 
 
 def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
