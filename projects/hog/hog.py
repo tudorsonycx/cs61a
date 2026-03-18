@@ -79,7 +79,8 @@ def simple_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the total score of a player who starts their turn with
     PLAYER_SCORE and then rolls NUM_ROLLS DICE, ignoring Sus Fuss.
     """
-    score = player_score + take_turn(num_rolls, player_score, opponent_score, dice)
+    score = player_score + take_turn(num_rolls, player_score, opponent_score,
+                                     dice)
     return score
 
 
@@ -98,6 +99,9 @@ def is_prime(n):
 def num_factors(n):
     """Return the number of factors of N, including 1 and N itself."""
     # BEGIN PROBLEM 4
+    if n == 1:
+        return 1
+
     total_factors = 2
 
     i = 2
@@ -117,7 +121,16 @@ def num_factors(n):
 def sus_points(score):
     """Return the new score of a player taking into account the Sus Fuss rule."""
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    factors = num_factors(score)
+
+    if factors == 3 or factors == 4:
+        if not score % 2:
+            score += 1
+
+        while not is_prime(score):
+            score += 2
+
+    return score
     # END PROBLEM 4
 
 
@@ -126,7 +139,12 @@ def sus_update(num_rolls, player_score, opponent_score, dice=six_sided):
     PLAYER_SCORE and then rolls NUM_ROLLS DICE, *including* Sus Fuss.
     """
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    score_before_sus = player_score + take_turn(num_rolls, player_score,
+                                                opponent_score, dice)
+
+    score = sus_points(score_before_sus)
+
+    return score
     # END PROBLEM 4
 
 
@@ -165,7 +183,13 @@ def play(strategy0, strategy1, update,
     """
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    while score0 < goal and score1 < goal:
+        if not who:
+            score0 = update(strategy0(score0, score1), score0, score1, dice)
+        else:
+            score1 = update(strategy1(score1, score0), score1, score0, dice)
+
+        who = 1 - who
     # END PROBLEM 5
     return score0, score1
 
@@ -278,7 +302,8 @@ def run_experiments():
     six_sided_max = max_scoring_num_rolls(six_sided)
     print('Max scoring num rolls for six-sided dice:', six_sided_max)
 
-    print('always_roll(6) win rate:', average_win_rate(always_roll(6)))  # near 0.5
+    print('always_roll(6) win rate:',
+          average_win_rate(always_roll(6)))  # near 0.5
     print('catch_up win rate:', average_win_rate(catch_up))
     print('always_roll(3) win rate:', average_win_rate(always_roll(3)))
     print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
