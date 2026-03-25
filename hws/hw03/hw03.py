@@ -32,6 +32,74 @@ def num_eights(n):
     return 0
 
 
+def num_eights_alt(n):
+    """Returns the number of times 8 appears as a digit of n.
+
+    >>> num_eights_alt(3)
+    0
+    >>> num_eights_alt(8)
+    1
+    >>> num_eights_alt(88888888)
+    8
+    >>> num_eights_alt(2638)
+    1
+    >>> num_eights_alt(86380)
+    2
+    >>> num_eights_alt(12345)
+    0
+    >>> num_eights_alt(8782089)
+    3
+    >>> from construct_check import check
+    >>> # ban all assignment statements
+    >>> check(HW_SOURCE_FILE, 'num_eights_alt',
+    ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
+    True
+    """
+    if n == 0:
+        return 0
+
+    if n % 10 == 8:
+        return 1 + num_eights(n // 10)
+
+    return num_eights(n // 10)
+
+
+def num_eights_tailrec(n):
+    """Returns the number of times 8 appears as a digit of n.
+
+    >>> num_eights_tailrec(3)
+    0
+    >>> num_eights_tailrec(8)
+    1
+    >>> num_eights_tailrec(88888888)
+    8
+    >>> num_eights_tailrec(2638)
+    1
+    >>> num_eights_tailrec(86380)
+    2
+    >>> num_eights_tailrec(12345)
+    0
+    >>> num_eights_tailrec(8782089)
+    3
+    >>> from construct_check import check
+    >>> # ban all assignment statements
+    >>> check(HW_SOURCE_FILE, 'num_eights_tailrec',
+    ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
+    True
+    """
+
+    def loop(n, res):
+        if n == 0:
+            return res
+
+        if n % 10 == 8:
+            return loop(n // 10, res + 1)
+
+        return loop(n // 10, res)
+
+    return loop(n, 0)
+
+
 def digit_distance(n):
     """Determines the digit distance of n.
 
@@ -55,6 +123,62 @@ def digit_distance(n):
         return abs(n % 10 - n // 10 % 10) + digit_distance(n // 10)
 
     return 0
+
+
+def digit_distance_tailrec(n):
+    """Determines the digit distance of n.
+
+    >>> digit_distance_tailrec(3)
+    0
+    >>> digit_distance_tailrec(777) # 0 + 0
+    0
+    >>> digit_distance_tailrec(314) # 2 + 3
+    5
+    >>> digit_distance_tailrec(31415926535) # 2 + 3 + 3 + 4 + ... + 2
+    32
+    >>> digit_distance_tailrec(3464660003)  # 1 + 2 + 2 + 2 + ... + 3
+    16
+    >>> from construct_check import check
+    >>> # ban all loops
+    >>> check(HW_SOURCE_FILE, 'digit_distance_tailrec',
+    ...       ['For', 'While'])
+    True
+    """
+
+    def loop(n, res):
+        if n < 10:
+            return res
+        return loop(n // 10, res + abs(n % 10 - n // 10 % 10))
+
+    return loop(n, 0)
+
+
+def digit_distance_alt(n):
+    """Determines the digit distance of n.
+
+    >>> digit_distance_alt(3)
+    0
+    >>> digit_distance_alt(777) # 0 + 0
+    0
+    >>> digit_distance_alt(314) # 2 + 3
+    5
+    >>> digit_distance_alt(31415926535) # 2 + 3 + 3 + 4 + ... + 2
+    32
+    >>> digit_distance_alt(3464660003)  # 1 + 2 + 2 + 2 + ... + 3
+    16
+    >>> from construct_check import check
+    >>> # ban all loops
+    >>> check(HW_SOURCE_FILE, 'digit_distance_alt',
+    ...       ['For', 'While'])
+    True
+    """
+
+    def loop(last, n):
+        if n == 0:
+            return 0
+        return abs(last - n % 10) + loop(n % 10, n // 10)
+
+    return loop(n % 10, n // 10)
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -86,6 +210,104 @@ def interleaved_sum(n, odd_func, even_func):
         return f(k) + loop(k + 1, g, f)
 
     return loop(1, odd_func, even_func)
+
+
+def interleaved_sum_tailrec(n, odd_func, even_func):
+    """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
+    to n.
+
+    >>> identity = lambda x: x
+    >>> square = lambda x: x * x
+    >>> triple = lambda x: x * 3
+    >>> interleaved_sum_tailrec(5, identity, square) # 1   + 2*2 + 3   + 4*4 + 5
+    29
+    >>> interleaved_sum_tailrec(5, square, identity) # 1*1 + 2   + 3*3 + 4   + 5*5
+    41
+    >>> interleaved_sum_tailrec(4, triple, square)   # 1*3 + 2*2 + 3*3 + 4*4
+    32
+    >>> interleaved_sum_tailrec(4, square, triple)   # 1*1 + 2*3 + 3*3 + 4*3
+    28
+    >>> from construct_check import check
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_tailrec', ['While', 'For', 'Mod']) # ban loops and %
+    True
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_tailrec', ['BitAnd', 'BitOr', 'BitXor']) # ban bitwise operators, don't worry about these if you don't know what they are
+    True
+    """
+
+    def loop(i, f, g, res):
+        if i > n:
+            return res
+        return loop(i + 1, g, f, res + f(i))
+
+    return loop(1, odd_func, even_func, 0)
+
+
+def interleaved_sum_alt(n, odd_func, even_func):
+    """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
+    to n.
+
+    >>> identity = lambda x: x
+    >>> square = lambda x: x * x
+    >>> triple = lambda x: x * 3
+    >>> interleaved_sum_alt(5, identity, square) # 1   + 2*2 + 3   + 4*4 + 5
+    29
+    >>> interleaved_sum_alt(5, square, identity) # 1*1 + 2   + 3*3 + 4   + 5*5
+    41
+    >>> interleaved_sum_alt(4, triple, square)   # 1*3 + 2*2 + 3*3 + 4*4
+    32
+    >>> interleaved_sum_alt(4, square, triple)   # 1*1 + 2*3 + 3*3 + 4*3
+    28
+    >>> from construct_check import check
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_alt', ['While', 'For', 'Mod']) # ban loops and %
+    True
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_alt', ['BitAnd', 'BitOr', 'BitXor']) # ban bitwise operators, don't worry about these if you don't know what they are
+    True
+    """
+
+    def loop(k):
+        if k > n:
+            return 0
+
+        if k == n:
+            return odd_func(k)
+
+        return odd_func(k) + even_func(k + 1) + loop(k + 2)
+
+    return loop(1)
+
+
+def interleaved_sum_alt_tailrec(n, odd_func, even_func):
+    """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
+    to n.
+
+    >>> identity = lambda x: x
+    >>> square = lambda x: x * x
+    >>> triple = lambda x: x * 3
+    >>> interleaved_sum_alt_tailrec(5, identity, square) # 1   + 2*2 + 3   + 4*4 + 5
+    29
+    >>> interleaved_sum_alt_tailrec(5, square, identity) # 1*1 + 2   + 3*3 + 4   + 5*5
+    41
+    >>> interleaved_sum_alt_tailrec(4, triple, square)   # 1*3 + 2*2 + 3*3 + 4*4
+    32
+    >>> interleaved_sum_alt_tailrec(4, square, triple)   # 1*1 + 2*3 + 3*3 + 4*3
+    28
+    >>> from construct_check import check
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_alt_tailrec', ['While', 'For', 'Mod']) # ban loops and %
+    True
+    >>> check(HW_SOURCE_FILE, 'interleaved_sum_alt_tailrec', ['BitAnd', 'BitOr', 'BitXor']) # ban bitwise operators, don't worry about these if you don't know what they are
+    True
+    """
+
+    def loop(k, res):
+        if k > n:
+            return res
+
+        if k == n:
+            return odd_func(k) + res
+
+        return loop(k + 2, odd_func(k) + even_func(k + 1) + res)
+
+    return loop(1, 0)
 
 
 def next_smaller_dollar(bill):
@@ -124,9 +346,7 @@ def count_dollars(total):
     """
 
     def loop(total, bill):
-        if total < 0:
-            return 0
-        if bill == 0:
+        if total < 0 or bill is None:
             return 0
         if total == 0:
             return 1
@@ -135,10 +355,7 @@ def count_dollars(total):
 
         next_bill = next_smaller_dollar(bill)
 
-        without_bill = 0
-
-        if next_bill:
-            without_bill = loop(total, next_bill)
+        without_bill = loop(total, next_bill)
 
         return with_bill + without_bill
 
@@ -179,8 +396,9 @@ def count_dollars_upward(total):
     >>> check(HW_SOURCE_FILE, 'count_dollars_upward', ['While', 'For'])
     True
     """
+
     def loop(total, bill):
-        if total < 0 or bill == 0:
+        if total < 0 or bill is None:
             return 0
         if total == 0:
             return 1
@@ -189,10 +407,7 @@ def count_dollars_upward(total):
 
         next_bill = next_larger_dollar(bill)
 
-        without_bill = 0
-
-        if next_bill:
-            without_bill = loop(total, next_bill)
+        without_bill = loop(total, next_bill)
 
         return with_bill + without_bill
 
@@ -232,7 +447,15 @@ def move_stack(n, start, end):
     Move the top disk from rod 1 to rod 3
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
-    "*** YOUR CODE HERE ***"
+
+    if n == 1:
+        print_move(start, end)
+    else:
+        aux = 6 - start - end
+
+        move_stack(n - 1, start, aux)
+        print_move(start, end)
+        move_stack(n - 1, aux, end)
 
 
 def make_anonymous_factorial():
@@ -246,4 +469,18 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f: f(f))(lambda f: lambda x: x * f(f)(x - 1) if x > 1 else 1)
+
+
+def make_anonymous_factorial_alt():
+    """Return the value of an expression that computes factorial.
+
+    >>> make_anonymous_factorial_alt()(5)
+    120
+    >>> from construct_check import check
+    >>> # ban any assignments or recursion
+    >>> check(HW_SOURCE_FILE, 'make_anonymous_factorial_alt',
+    ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
+    True
+    """
+    return (lambda f: lambda n: f(n, f))(lambda n, f: n * f(n - 1, f) if n > 1 else 1)
