@@ -86,7 +86,14 @@ def biggest_palindrome(n):
 
 
 def palinkdrome(n):
-    return outer([], n)
+    """Return a function that returns a palindrome starting with the args of n repeated calls.
+    >>> print(palinkdrome(3)(5)(6)(7))
+    [5, 6, 7, 7, 6, 5]
+    >>> print(palinkdrome(1)(4))
+    [4, 4]
+    """
+    return outer(None, n)
+
 
 
 def outer(r, n):
