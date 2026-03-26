@@ -68,8 +68,10 @@ def biggest_palindrome(n):
     def loop(i, j):
         if i >= j:
             return ''
+
         if n[i] == n[j]:
             return n[i] + loop(i + 1, j - 1) + n[i]
+
         i_first = loop(i + 1, j)
         j_first = loop(i, j - 1)
 
@@ -78,7 +80,9 @@ def biggest_palindrome(n):
 
         return i_first if i_first_int > j_first_int else j_first
 
-    return int(loop(0, len(n) - 1))
+    res = loop(0, len(n) - 1)
+
+    return int(res) if res else 0
 
 
 def palinkdrome(n):
