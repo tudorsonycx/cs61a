@@ -63,24 +63,22 @@ def biggest_palindrome(n):
     >>> biggest_palindrome(126130450234125)
     21300312
     """
-    m = n
-    rev = 0
-    while m > 0:
-        rev = rev * 10 + m % 10
-        m //= 10
+    n = str(n)
 
-    def loop(x, y):
-        if x == 0 or y == 0:
-            return 0
+    def loop(i, j):
+        if i >= j:
+            return ''
+        if n[i] == n[j]:
+            return n[i] + loop(i + 1, j - 1) + n[i]
+        i_first = loop(i + 1, j)
+        j_first = loop(i, j - 1)
 
-        if x % 10 == y % 10:
-            return loop(x // 10, y // 10) * 10 + x % 10
-        else:
-            p1 = loop(x // 10, y)
-            p2 = loop(x, y // 10)
-            return max(p1, p2)
+        i_first_int = int(i_first) if i_first else 0
+        j_first_int = int(j_first) if j_first else 0
 
-    return loop(n, rev)
+        return i_first if i_first_int > j_first_int else j_first
+
+    return int(loop(0, len(n) - 1))
 
 
 def palinkdrome(n):
