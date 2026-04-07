@@ -92,7 +92,7 @@ def palinkdrome(n):
     >>> print(palinkdrome(1)(4))
     [4, 4]
     """
-    return outer(None, n)
+    return outer([], n)
 
 
 
